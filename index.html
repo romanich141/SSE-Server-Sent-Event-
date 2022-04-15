@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat</title>
+  <script defer>
+    document.addEventListener('DOMContentLoaded', () => {
+      const nick = prompt('Enter you nickname');
+      let input = document.getElementById('input');
+      console.log(input);
+      input.focus();
+  
+      const chat = new EventSource('/chat');
+      chat.addEventListener('chat', event => {
+        const div = document.createElement('div');
+        div.append(event.data);
+        input.before(div);
+        input.scrollIntoView();
+      });
+  
+      input.addEventListener('change', evt => {
+        const value = evt.target.value;
+  
+        fetch('/chat', {
+          method: 'POST',
+          body: `${ nick }: ${ value }`
+        })
+        .catch(console.error);
+  
+        input.value = '';
+      })
+    })
+  </script>
+</head>
+<body>
+  <input id="input" type="text" style="width: 100%; padding: 10px; border: 1px solid black">
+</body>
+</html>
